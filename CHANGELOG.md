@@ -5,6 +5,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+- **Google Calendar** events now load: mic-guard downloads your calendar's secret iCal link (`CalendarUrl` in `mic-guard.ini`) and the tile reads the local copy. View only.
+
 ## [1.0.0] - 2026-11-21
 
 First public release.

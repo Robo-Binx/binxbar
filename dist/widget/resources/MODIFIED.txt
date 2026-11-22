@@ -1,3 +1,0 @@
-Modified from Flip Clock by inerthel-agi (github.com/inerthel-agi/icue-edge-widgets), Apache-2.0.
-Changes: date shown at Small size, 12-hour default, US date format, renamed.
-Added: Salvage HUD face, compact layout, current weather via Open-Meteo.

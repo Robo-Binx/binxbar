@@ -5,6 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-22
+
+### Added
+- **SPEAKER button:** third button under ON and MUTE ALL. One tap moves Windows sound from your headset to a speaker (Bluetooth or wired), the next tap moves it back. Shows HEADSET, or the speaker's name in blue. Set it up in `edge-display/speaker-switch.ini` and Stream Deck key 14.
+
+### Changed
+- Bigger top section (mic panel and audio buttons), easier to read at a glance; six buttons, three each side.
+- Smaller clock and date; the weather keeps its size.
+
 ### Fixed
 - **Google Calendar** events now load: mic-guard downloads your calendar's secret iCal link (`CalendarUrl` in `mic-guard.ini`) and the tile reads the local copy. View only.
 
@@ -26,5 +35,6 @@ First public release.
 - Flip clock, month calendar with Google Calendar (iCal).
 - Guides for installation, Stream Deck keys, troubleshooting, architecture, and AI-assisted setup.
 
-[Unreleased]: https://github.com/Robo-Binx/binxbar/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Robo-Binx/binxbar/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Robo-Binx/binxbar/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Robo-Binx/binxbar/releases/tag/v1.0.0

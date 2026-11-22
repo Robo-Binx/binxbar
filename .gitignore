@@ -9,3 +9,5 @@ widget/resources/vol.json
 widget/resources/media-src.json
 edge-display/player-state.txt
 widget/resources/calendar.ics
+widget/resources/speaker.json
+edge-display/speaker-switch.last

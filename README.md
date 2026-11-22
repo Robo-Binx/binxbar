@@ -28,6 +28,7 @@ Mic and Discord controls, a music player, screen controls and a live weather sta
 | 📡 **STREAM GAME** | Go live in your call with whatever game you're playing. Blinks green while you're live. |
 | 📴 **DISCONNECT DISCORD** | Leave any call, DMs included. |
 | 🎧 **GO MOBILE** | One tap moves Discord to your headset mic so you can walk away from the desk (optional). |
+| 🔊 **SPEAKER** | One tap moves your PC's sound from your headset to a speaker (Bluetooth or wired), and back (optional). |
 | 🎵 **Music row** | Spotify, YouTube, SoundCloud, Twitch, VLC and more: previous / play / next and a tap-anywhere volume bar. |
 | 🌦️ **Weather station** | Live radar, a 2-hour rain forecast, cloud, wind, pressure and storm layers, and search for any city. |
 | 🖥️ **Screen control** | Brightness presets, plus a keyboard key that turns the Edge off and on. |
@@ -37,16 +38,16 @@ Mic and Discord controls, a music player, screen controls and a live weather sta
 <td><img src="docs/images/controls.jpg" alt="Mic row"></td>
 <td><img src="docs/images/radar-wind.jpg" alt="Weather station"></td>
 </tr><tr>
-<td align="center">Mic row: GO MOBILE, STREAM and DISCONNECT on the left; sound and MUTE ALL on the right</td>
+<td align="center">Mic row: GO MOBILE, STREAM and DISCONNECT on the left; sound, MUTE ALL and SPEAKER on the right</td>
 <td align="center">Weather station: wind layer over your area</td>
 </tr></table>
 
 ## Quick start
 
-> **New to GitHub?** You don't need an account. Click [**Download**](https://github.com/Robo-Binx/binxbar/releases/latest), grab `Binxbar-1.0.0.icuewidget` and `Source code (zip)`, then follow the [installation guide](docs/installation.md).
+> **New to GitHub?** You don't need an account. Click [**Download**](https://github.com/Robo-Binx/binxbar/releases/latest), grab `Binxbar-1.1.0.icuewidget` and `Source code (zip)`, then follow the [installation guide](docs/installation.md).
 
 1. **Install the free programs:** [iCUE](https://www.corsair.com/icue) 5.52+, the [Elgato Stream Deck](https://www.elgato.com/downloads) app (no hardware needed) with its **Discord** and **Audio Mute** plugins, and [Twinkle Tray](https://twinkletray.com) for brightness and the on/off key.
-2. **Import the widget:** iCUE → Xeneon Edge → Widgets → **+** → `Binxbar-1.0.0.icuewidget`, then drag it onto the Edge (size M).
+2. **Import the widget:** iCUE → Xeneon Edge → Widgets → **+** → `Binxbar-1.1.0.icuewidget`, then drag it onto the Edge (size M).
 3. **Set up the Stream Deck keys:** [stream-deck-keys.md](docs/stream-deck-keys.md).
 4. **Start the helper:** edit `mic-guard/mic-guard.ini`, then run `mic-guard.vbs` and `add-to-startup.vbs`.
 

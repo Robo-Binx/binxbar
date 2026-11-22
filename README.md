@@ -9,7 +9,6 @@ Mic and Discord controls, a music player, screen controls and a live weather sta
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows-0078d4)
 ![iCUE](https://img.shields.io/badge/iCUE-5.52%2B-yellow)
-[![Built with Claude](https://img.shields.io/badge/built%20with-Claude-d97757)](#built-with-ai)
 
 ![Binxbar on the Xeneon Edge](docs/images/binxbar.jpg)
 
@@ -91,11 +90,7 @@ dist/          the packaged .icuewidget
 
 ## Contributing
 
-Bug reports, ideas and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and please follow the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues: [SECURITY.md](SECURITY.md).
-
-## Built with AI
-
-Binxbar was designed by Binx and built with **Claude** (Anthropic), from the code to the docs. Contributions made with AI assistants are welcome too: [AGENTS.md](AGENTS.md) has the project conventions for coding agents.
+Bug reports, ideas and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and please follow the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues: [SECURITY.md](SECURITY.md). Using a coding agent? Point it at [AGENTS.md](AGENTS.md).
 
 ## License & credits
 

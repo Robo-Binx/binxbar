@@ -536,3 +536,22 @@ html, body, #widget, #widget[data-face] { background: #000 !important; }
 .aud-stream.st-on { --st: #3dd68c; }
 .aud-stream.st-on::before { animation: stBlink 2.6s ease-in-out infinite !important; }
 .aud-stream.st-on .st-icon, .aud-stream.st-on .st-label { animation: stBlink 2.6s ease-in-out infinite; }
+
+/* Sound output switch (headset <-> Bluetooth speaker): third button under ON / MUTE ALL */
+.audio-side { gap: 1.2vmin; }
+.audio-side .aud-btn > :last-child { margin-bottom: 8cqh; }
+.aud-out { --out: #9a97a0; --glow: #6f6b74; gap: 6cqh; isolation: isolate; border: 2px solid rgba(217, 214, 207, 0.55) !important; }
+.aud-out.on { --out: #7cc4ff; --glow: #7cc4ff; border-color: color-mix(in srgb, #7cc4ff 80%, transparent) !important; }
+.aud-out.on::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 1.6vmin; background: radial-gradient(75% 80% at 50% 100%, color-mix(in srgb, #7cc4ff 30%, transparent), transparent 78%); }
+.out-icon { width: 34cqh; height: 34cqh; max-width: 40cqw; color: color-mix(in srgb, var(--out) 70%, #fff); }
+.out-label { font: 700 clamp(7px, 13cqh, 18px)/1 var(--sv-font, "Segoe UI", sans-serif); letter-spacing: 0.16em; color: color-mix(in srgb, var(--out) 70%, #fff); white-space: nowrap; }
+.aud-out.pending { animation: outPulse .8s ease-in-out infinite; }
+@keyframes outPulse { 50% { opacity: .45; } }
+
+/* Bigger top section, smaller clock and date (weather keeps its size) */
+.mod-row { flex: 1.6 1 0; }
+.mod-top { flex: 0.85 1 0; --h: min(40cqh, calc(34cqw / (var(--n) * 0.74 + var(--groups) * 0.25 + 0.3))); }
+.mod-top .date { font-size: clamp(10px, 9.5cqh, 24px) !important; }
+.mod-top .wx-temp { font-size: clamp(24px, 34cqh, 96px); }
+.mod-top .wx-cond { font-size: clamp(11px, 11cqh, 28px); }
+.mod-top .wx-hl, .mod-top .wx-city { font-size: clamp(10px, 8.5cqh, 22px); }

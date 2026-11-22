@@ -42,7 +42,6 @@ Click the tile in iCUE to open its settings:
 | **Mobile Mode Mic Name Contains** | (Only if GO MOBILE is on) a word from your headset mic's Windows name, e.g. `Arctis`, `Cloud`. |
 | **City**, **Units** | Your weather city and °F/°C. |
 | **Radar Map Key** | The CARTO key from the table above. |
-| **Google Calendar iCal Link** | Optional. Google Calendar → Settings → your calendar → *Secret address in iCal format*. |
 
 ### 3. Set up the Stream Deck keys
 The tile can't run programs itself (iCUE's sandbox doesn't allow it), so it presses keys on a **virtual Stream Deck** that iCUE creates, and those keys do the work. Follow **[Stream Deck keys](stream-deck-keys.md)** to set up the 8 × 4 grid, then come back here.
@@ -94,6 +93,14 @@ Binxbar is a control station, so set up both parts.
 3. Prefer a macro key or a real Stream Deck? Point it at `edge-display\toggle.vbs` (or `off.vbs` / `on.vbs`). For a macro key, make a shortcut to `wscript.exe "C:\...\edge-display\toggle.vbs"` and launch that.
 
 Just want it dark, not off? Use the 10% preset.
+
+### Google Calendar (optional, view only)
+Tap the date on the clock to open the month calendar. To show your events on it:
+1. Open Google Calendar on the web → ⚙️ **Settings** → click your calendar on the left → **Integrate calendar**.
+2. Copy **Secret address in iCal format** (it ends in `basic.ics`). No Google account sign-in, API key or token is needed.
+3. Paste it into `mic-guard\mic-guard.ini` after `CalendarUrl=`, save, and run `restart-mic-guard.vbs`.
+
+mic-guard downloads the calendar every 10 minutes into the widget folder; the tile reads that copy (it can't fetch Google directly). **Keep the link private**: anyone who has it can read your calendar. It stays in your local `mic-guard.ini` and is never logged. Adding or editing events from the Edge isn't supported.
 
 ### 8. Music
 Nothing to set up beyond keys 10, 11 and 17. **Double-tap the music row** to bring your music app up on your main monitor. If nothing is open, pressing play starts Spotify and resumes.

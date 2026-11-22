@@ -152,4 +152,25 @@
     }
     $("muVol").addEventListener("pointerup", e => { e.stopPropagation(); setVolumeAt(e.clientX); });
     $("muVol").addEventListener("pointerdown", e => e.stopPropagation());
+    // Sound output switch: tap to flip between your headset and your Bluetooth speaker.
+    // Stream Deck key 14 runs speaker-switch.vbs, which writes resources/speaker.json.
+    const SPEAKER_KEY = 19;
+    const outBtn = $("muOut"), outLabel = $("muOutLabel");
+    let outBusy = 0;
+    function readOut() {
+        if (!outBtn) return;
+        fetch("resources/speaker.json?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => {
+            if (!j || Date.now() < outBusy) return;
+            const m = /\(([^)]+)\)/.exec(String(j.device || "")), short = m ? m[1].split(/\s+/)[0].toUpperCase() : "SPEAKER";
+            outBtn.classList.toggle("on", !!j.speaker);
+            outLabel.textContent = j.speaker ? short.slice(0, 9) : "HEADSET";
+            if (j.missing && Date.now() - j.t < 8000) { outLabel.textContent = "NO SPEAKER"; setTimeout(readOut, 3000); }
+        }).catch(() => {});
+    }
+    if (outBtn) tap(outBtn, () => {
+        if (!(window.Binxbar && window.Binxbar.tapKey(SPEAKER_KEY))) { outLabel.textContent = "CAN'T"; setTimeout(readOut, 2500); return; }
+        outBusy = Date.now() + 1500; outBtn.classList.add("pending");
+        [1600, 3000, 5000].forEach(ms => setTimeout(readOut, ms)); setTimeout(() => outBtn.classList.remove("pending"), 5200);
+    });
+    readOut(); setInterval(readOut, 5000);
 })();

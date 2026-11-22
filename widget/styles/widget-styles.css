@@ -45,7 +45,7 @@
 [data-style="nothing"] .x-bar { background: var(--s-bar-track); }
 [data-style="nothing"] .x-bar > i { background: var(--s-bar-fill); }
 
-/* ---------- Anthropic: warm, serif headlines, clay accent ---------- */
+/* ---------- Clay: warm, serif headlines, clay accent ---------- */
 [data-style="anthropic"] { --x-bg: #262624; --x-text: #faf9f5; --x-accent: #d97757; --s-font: "Segoe UI Variable Text", "Segoe UI", sans-serif; --s-num-font: "Tiempos Headline", Georgia, "Times New Roman", serif;
   --s-case: none; --s-track: 0.01em; --s-kw: 600; --s-pill: 99px; --s-badge-left: 0; --s-badge-bg: rgba(217, 119, 87, 0.2); --s-badge-text: #f0b8a4; --s-badge-pad: 6px 14px;
   --s-radius: 16px; --s-card-top: 0; --s-card-bg: #30302e; --s-card-border: 1px solid #3d3d3a; --s-card-pad: 9px 14px; --s-num-w: 500; --s-num-track: -0.02em; --s-bar-h: 8px; --s-bar-track: #3d3d3a; --s-bar-fill: #d97757; --s-overlay-line: 0; }

@@ -251,25 +251,29 @@ public static class MicGuard {
           WriteRes("lounge.json", "{\"t\":" + (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds + ",\"data\":" + raw + "}"); } }
       catch (Exception e) { Log("lounge fetch failed: " + e.Message); }
       Thread.Sleep(30000); } }
-  // Google Calendar (view only): download your secret iCal link every 10 minutes into resources/calendar.ics.
+  // Google Calendar (view only): download your secret iCal link(s) every 10 minutes into resources/calendar.ics.
+  // Several calendars (e.g. yours and a shared one) are separated by spaces; their events are merged.
   // The tile can't fetch Google directly (blocked by the browser), so it reads this local copy.
-  // The link itself is never logged.
+  // The links themselves are never logged.
   static string calUrl = "";
   static void CalendarLoop() {
     ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;  // TLS 1.2
-    string url = Regex.Replace(calUrl, "^webcal:", "https:", RegexOptions.IgnoreCase);
+    string[] urls = calUrl.Split(new[] { ' ', ',', ';', '\t' }, StringSplitOptions.RemoveEmptyEntries);
     while (true) {
-      try { using (var wc = new WebClient()) { wc.Encoding = Encoding.UTF8; wc.Headers.Add("User-Agent", "Binxbar/1.0");
-          string ics = wc.DownloadString(url);
-          if (ics.Contains("BEGIN:VCALENDAR")) WriteRes("calendar.ics", ics); else Log("calendar: link didn't return a calendar"); } }
-      catch (Exception e) { Log("calendar fetch failed: " + (e is WebException ? ((WebException)e).Status.ToString() : e.GetType().Name)); }
+      var all = new StringBuilder(); int ok = 0;
+      for (int i = 0; i < urls.Length; i++) {
+        try { using (var wc = new WebClient()) { wc.Encoding = Encoding.UTF8; wc.Headers.Add("User-Agent", "Binxbar/1.0");
+            string ics = wc.DownloadString(Regex.Replace(urls[i], "^webcal:", "https:", RegexOptions.IgnoreCase));
+            if (ics.Contains("BEGIN:VCALENDAR")) { all.AppendLine(ics); ok++; } else Log("calendar " + (i + 1) + ": link didn't return a calendar"); } }
+        catch (Exception e) { Log("calendar " + (i + 1) + " fetch failed: " + (e is WebException ? ((WebException)e).Status.ToString() : e.GetType().Name)); } }
+      if (ok > 0) WriteRes("calendar.ics", all.ToString());
       Thread.Sleep(600000); } }
   static void StartExtras(string outFile, string lounge, string cal) {
     resDir = Path.GetDirectoryName(outFile); loungeId = (lounge ?? "").Trim(); calUrl = (cal ?? "").Trim();
     EnsureOutVol();
     var a = new Thread(MediaSourceLoop); a.IsBackground = true; a.Start();
     if (loungeId.Length > 0) { var b = new Thread(LoungeLoop); b.IsBackground = true; b.Start(); Log("lounge feed on for server " + loungeId); }
-    if (calUrl.Length > 0) { var c = new Thread(CalendarLoop); c.IsBackground = true; c.Start(); Log("calendar sync on"); } }
+    if (calUrl.Length > 0) { var c = new Thread(CalendarLoop); c.IsBackground = true; c.Start(); Log("calendar sync on (" + calUrl.Split(new[] { ' ', ',', ';', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length + " calendar(s))"); } }
   public static void Run(string outFile, string logFile, string names, string lounge, string cal) {
     outPath = outFile; logPath = logFile; mainNames = names.ToLowerInvariant().Split(',');
     bool created; mtx = new Mutex(true, "BinxbarMicGuard", out created);

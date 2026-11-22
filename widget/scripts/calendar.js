@@ -86,19 +86,25 @@
         return occ.sort((a, b) => a.start - b.start);
     }
 
+    // Events come from resources/calendar.ics, which mic-guard downloads from your Google Calendar's secret iCal link
+    // (CalendarUrl in mic-guard.ini). The tile can't fetch Google itself: the browser blocks it.
+    async function fetchText(u) {
+        const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
+        try { const r = await fetch(u, { cache: "no-store", signal: ctl.signal }); if (!r.ok) throw new Error("HTTP " + r.status); return await r.text(); }
+        finally { clearTimeout(t); }
+    }
     async function load() {
         clearTimeout(timer);
-        const url = String(setting("calendarUrl", "")).trim();
-        if (!url) { events = []; status = "none"; render(); return; }
-        try {
-            const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
-            const r = await fetch(url.replace(/^webcal:/i, "https:"), { cache: "no-store", signal: ctl.signal });
-            clearTimeout(t);
-            if (!r.ok) throw new Error("HTTP " + r.status);
-            events = parseIcs(await r.text()); status = "ok";
-        } catch (e) { status = events.length ? "stale" : "error"; }
+        let ics = "";
+        try { ics = await fetchText("resources/calendar.ics?t=" + Date.now()); } catch (e) {}
+        if (!/BEGIN:VCALENDAR/.test(ics)) {   // older setups: link pasted in the widget setting
+            const url = String(setting("calendarUrl", "")).trim();
+            if (url) { try { ics = await fetchText(url.replace(/^webcal:/i, "https:")); } catch (e) {} }
+        }
+        if (/BEGIN:VCALENDAR/.test(ics)) { events = parseIcs(ics); status = "ok"; }
+        else status = events.length ? "stale" : (String(setting("calendarUrl", "")).trim() ? "error" : "none");
         render();
-        timer = setTimeout(load, REFRESH_MS);
+        timer = setTimeout(load, 60000);   // mic-guard refreshes the file every 10 min; re-read it every minute
     }
 
     function dayEvents(d) {
@@ -149,7 +155,7 @@
         rhead.append(el("div", "cal-agenda-title", label), back);
         right.append(rhead);
         const list = el("div", "cal-list");
-        if (status === "none") list.append(el("div", "cal-note", "Add your Google Calendar iCal link in iCUE to see events."));
+        if (status === "none") list.append(el("div", "cal-note", "Add your Google Calendar link to mic-guard.ini (CalendarUrl) to see events."));
         else if (status === "error") list.append(el("div", "cal-note", "Couldn't load your calendar."));
         else {
             const evs = dayEvents(selected);

@@ -102,6 +102,14 @@ Tap the date on the clock to open the month calendar. To show your events on it:
 
 mic-guard downloads the calendar every 10 minutes into the widget folder; the tile reads that copy (it can't fetch Google directly). **Keep the link private**: anyone who has it can read your calendar. It stays in your local `mic-guard.ini` and is never logged. Adding or editing events from the Edge isn't supported.
 
+### Speaker switch (optional)
+
+The **SPEAKER** button (right side, under MUTE ALL) flips your PC's sound between your headset and a speaker.
+
+1. Open `edge-display\speaker-switch.ini`. Set `Speaker=` to a word from your speaker's name and `Headset=` to a word from your headset's name. Find the names in Windows: **Settings > System > Sound > Output**.
+2. In the Stream Deck app, set up key 14 (**System → Open** → `edge-display\speaker-switch.vbs`). See [Stream Deck keys](stream-deck-keys.md).
+3. Tap **SPEAKER** on the tile. It turns blue and shows your speaker's name; tap again to go back to **HEADSET**. If the speaker is off or not connected, it shows **NO SPEAKER** and your sound stays where it was.
+
 ### 8. Music
 Nothing to set up beyond keys 10, 11 and 17. **Double-tap the music row** to bring your music app up on your main monitor. If nothing is open, pressing play starts Spotify and resumes.
 

@@ -9,7 +9,7 @@ Binxbar talks to the outside world by pressing keys on a virtual Stream Deck (iC
 ```
         col 1        col 2        col 3        col 4         col 5      col 6      col 7      col 8
 row 1   SOUND MUTE   MIC MUTE     BRT -        DISCONNECT    CHANNEL 1  CHANNEL 2  CHANNEL 3  CHANNEL 4
-row 2   BRT +        VOL -        VOL +        CHANNEL 5     STREAM     -          -          -
+row 2   BRT +        VOL -        VOL +        CHANNEL 5     STREAM     SPEAKER    -          -
 row 3   PLAYER       DESK MIC     IN-CALL      -             -          -          -          -
 row 4   HEADSET MIC  HEADSET MUTE -            -             -          -          -          -
 ```
@@ -26,6 +26,7 @@ row 4   HEADSET MIC  HEADSET MUTE -            -             -          -       
 | 11 · VOL + | System → **Multimedia** | Increase Volume |
 | 12 · CHANNEL 5 | Discord → **Voice Channel** | The 5th name in *Tap-to-Join Channels* |
 | 13 · STREAM | Discord → **Stream Toggle** | Nothing to set |
+| 14 · SPEAKER | System → **Open** | `edge-display\speaker-switch.vbs` *(SPEAKER button only; set your device names in `edge-display\speaker-switch.ini`)* |
 | 17 · PLAYER | System → **Open** | `edge-display\show-player.vbs` |
 | 18 · DESK MIC | Discord → **Set Audio Device** | Mode **Set Input**, Input: **your mic** |
 | 19 · IN-CALL | Discord → **Video Toggle** | Nothing. The tile never presses it; it reads the key's icon to tell if you're in a call. |
@@ -33,7 +34,7 @@ row 4   HEADSET MIC  HEADSET MUTE -            -             -          -       
 | 26 · HEADSET MUTE | Audio Mute → **Toggle Mute** | Device: **your headset mic** *(GO MOBILE only)* |
 
 - **Keep the app on page 1.** The tile presses whatever page the app is showing.
-- Skip what you don't use: no brightness → leave 3 and 9 empty; GO MOBILE off → leave 25 and 26 empty; fewer channels → leave their keys empty.
+- Skip what you don't use: no brightness → leave 3 and 9 empty; no speaker → leave 14 empty; GO MOBILE off → leave 25 and 26 empty; fewer channels → leave their keys empty.
 - **Tip:** once one Voice Channel key is set up, click it, press **Ctrl+C**, click an empty key, **Ctrl+V**, and just change the channel.
 - When you drop an action on a key that already has one, Stream Deck asks *"replace this action?"*. If dragging seems to do nothing, look for that pop-up.
 

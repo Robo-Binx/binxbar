@@ -95,13 +95,14 @@ Stream Deck app → device **iCUE Widget N** → **page 1** → grid is **8 acro
 | 11 | System → Multimedia | Increase Volume |
 | 12 | Discord → Voice Channel | channel 5 from *Tap-to-Join Channels* |
 | 13 | Discord → Stream Toggle | nothing to set |
+| 14 | System → Open | `BINX\edge-display\speaker-switch.vbs` *(SPEAKER button; they set `Speaker=` / `Headset=` in `edge-display\speaker-switch.ini`)* |
 | 17 | System → Open | `BINX\edge-display\show-player.vbs` |
 | 18 | Discord → Set Audio Device | Set Input → **desk mic** |
 | 19 | Discord → Video Toggle | nothing (the tile reads its icon) |
 | 25 | Discord → Set Audio Device | Set Input → **headset mic** *(GO MOBILE only)* |
 | 26 | Audio Mute → Toggle Mute | **headset mic** *(GO MOBILE only)* |
 
-Remind them: keep the Stream Deck app on **page 1**; skip 3/9 without brightness, 25/26 without GO MOBILE, and unused channel keys. Copy-paste (Ctrl+C / Ctrl+V) a finished Voice Channel key to make the others faster.
+Remind them: keep the Stream Deck app on **page 1**; skip 3/9 without brightness, 14 without a speaker, 25/26 without GO MOBILE, and unused channel keys. Copy-paste (Ctrl+C / Ctrl+V) a finished Voice Channel key to make the others faster.
 
 **Test:** tap the big panel on the Edge → MUTED → tap → LIVE. Join a Discord voice channel → "ON DISCORD". Tap DISCONNECT DISCORD → they leave the call.
 

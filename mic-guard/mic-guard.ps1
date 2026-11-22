@@ -6,7 +6,7 @@
 # Settings: mic-guard.ini.  Log: mic-guard.log.
 $cs = @'
 using System; using System.IO; using System.Text; using System.Threading; using System.Diagnostics;
-using System.Collections.Generic; using System.Runtime.InteropServices; using System.Net;
+using System.Collections.Generic; using System.Runtime.InteropServices; using System.Net; using System.Text.RegularExpressions;
 
 [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")] class MMDeviceEnumeratorCo {}
 [Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -251,16 +251,30 @@ public static class MicGuard {
           WriteRes("lounge.json", "{\"t\":" + (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds + ",\"data\":" + raw + "}"); } }
       catch (Exception e) { Log("lounge fetch failed: " + e.Message); }
       Thread.Sleep(30000); } }
-  static void StartExtras(string outFile, string lounge) {
-    resDir = Path.GetDirectoryName(outFile); loungeId = (lounge ?? "").Trim();
+  // Google Calendar (view only): download your secret iCal link every 10 minutes into resources/calendar.ics.
+  // The tile can't fetch Google directly (blocked by the browser), so it reads this local copy.
+  // The link itself is never logged.
+  static string calUrl = "";
+  static void CalendarLoop() {
+    ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;  // TLS 1.2
+    string url = Regex.Replace(calUrl, "^webcal:", "https:", RegexOptions.IgnoreCase);
+    while (true) {
+      try { using (var wc = new WebClient()) { wc.Encoding = Encoding.UTF8; wc.Headers.Add("User-Agent", "Binxbar/1.0");
+          string ics = wc.DownloadString(url);
+          if (ics.Contains("BEGIN:VCALENDAR")) WriteRes("calendar.ics", ics); else Log("calendar: link didn't return a calendar"); } }
+      catch (Exception e) { Log("calendar fetch failed: " + (e is WebException ? ((WebException)e).Status.ToString() : e.GetType().Name)); }
+      Thread.Sleep(600000); } }
+  static void StartExtras(string outFile, string lounge, string cal) {
+    resDir = Path.GetDirectoryName(outFile); loungeId = (lounge ?? "").Trim(); calUrl = (cal ?? "").Trim();
     EnsureOutVol();
     var a = new Thread(MediaSourceLoop); a.IsBackground = true; a.Start();
-    if (loungeId.Length > 0) { var b = new Thread(LoungeLoop); b.IsBackground = true; b.Start(); Log("lounge feed on for server " + loungeId); } }
-  public static void Run(string outFile, string logFile, string names, string lounge) {
+    if (loungeId.Length > 0) { var b = new Thread(LoungeLoop); b.IsBackground = true; b.Start(); Log("lounge feed on for server " + loungeId); }
+    if (calUrl.Length > 0) { var c = new Thread(CalendarLoop); c.IsBackground = true; c.Start(); Log("calendar sync on"); } }
+  public static void Run(string outFile, string logFile, string names, string lounge, string cal) {
     outPath = outFile; logPath = logFile; mainNames = names.ToLowerInvariant().Split(',');
     bool created; mtx = new Mutex(true, "BinxbarMicGuard", out created);
     if (!created) { return; }
-    Log("started"); StartExtras(outFile, lounge); EnsureReg(); EnsureSessionRegs(); bool w0 = Check("startup"); while (w0) { if (ev.WaitOne(3000)) { ev.Set(); break; } w0 = Check("recheck"); }
+    Log("started"); StartExtras(outFile, lounge, cal); EnsureReg(); EnsureSessionRegs(); bool w0 = Check("startup"); while (w0) { if (ev.WaitOne(3000)) { ev.Set(); break; } w0 = Check("recheck"); }
     while (true) {
       if (!ev.WaitOne(60000)) { EnsureReg(); EnsureSessionRegs(); EnsureOutVol(); continue; }
       Thread.Sleep(1600); if (cmdPending) { Fix(); ev.Reset(); }
@@ -273,7 +287,7 @@ public static class MicGuard {
 '@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 # Settings live in mic-guard.ini next to this script.
-$cfg = @{ MainMic = 'CHANGE_ME'; WidgetFolder = '%APPDATA%\Corsair\CUE5\html_widgets\com\personal\binxbar'; LoungeServerId = '' }
+$cfg = @{ MainMic = 'CHANGE_ME'; WidgetFolder = '%APPDATA%\Corsair\CUE5\html_widgets\com\personal\binxbar'; LoungeServerId = ''; CalendarUrl = '' }
 $ini = Join-Path $here 'mic-guard.ini'
 if (Test-Path $ini) { foreach ($line in Get-Content $ini) {
     if ($line -match '^\s*([A-Za-z]+)\s*=\s*(.+?)\s*$' -and $line -notmatch '^\s*;') { $cfg[$matches[1]] = $matches[2] } } }
@@ -281,5 +295,5 @@ $widget = [Environment]::ExpandEnvironmentVariables($cfg['WidgetFolder'])
 $out  = Join-Path $widget 'resources\mic2.json'
 try {
   Add-Type -TypeDefinition $cs -Language CSharp -IgnoreWarnings
-  [MicGuard]::Run($out, (Join-Path $here 'mic-guard.log'), $cfg['MainMic'], $cfg['LoungeServerId'])
+  [MicGuard]::Run($out, (Join-Path $here 'mic-guard.log'), $cfg['MainMic'], $cfg['LoungeServerId'], $cfg['CalendarUrl'])
 } catch { Add-Content (Join-Path $here 'mic-guard.log') ("crash: " + $_) }

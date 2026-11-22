@@ -98,7 +98,7 @@ Just want it dark, not off? Use the 10% preset.
 Tap the date on the clock to open the month calendar. To show your events on it:
 1. Open Google Calendar on the web → ⚙️ **Settings** → click your calendar on the left → **Integrate calendar**.
 2. Copy **Secret address in iCal format** (it ends in `basic.ics`). No Google account sign-in, API key or token is needed.
-3. Paste it into `mic-guard\mic-guard.ini` after `CalendarUrl=`, save, and run `restart-mic-guard.vbs`.
+3. Paste it into `mic-guard\mic-guard.ini` after `CalendarUrl=`, save, and run `restart-mic-guard.vbs`. **More than one calendar** (yours plus a shared one, say)? Put a space between the links; their events show together.
 
 mic-guard downloads the calendar every 10 minutes into the widget folder; the tile reads that copy (it can't fetch Google directly). **Keep the link private**: anyone who has it can read your calendar. It stays in your local `mic-guard.ini` and is never logged. Adding or editing events from the Edge isn't supported.
 

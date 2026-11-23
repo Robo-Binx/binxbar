@@ -830,3 +830,37 @@ html, body, #widget, #widget[data-face] { background: #000 !important; }
   .mod-top .qk svg { width: clamp(26px, 26cqh, 80px); height: clamp(26px, 26cqh, 80px); }
   .mod-top .qk span { font-size: clamp(11px, 10cqh, 26px); letter-spacing: 0.12em; font-weight: 700; }
 }
+
+/* PHONE app tabs: fit all four on a portrait Edge */
+@media (max-aspect-ratio: 1/1) {
+  .ph-nav .fc-tabs { display: flex; flex-wrap: wrap; gap: 1.2vmin; min-width: 0; }
+  .ph-nav .fc-tab { font-size: clamp(11px, 3.3vw, 20px); letter-spacing: 0.12em; padding: 1vmin 2vmin; }
+}
+@media (max-aspect-ratio: 1/1) {
+  /* keypad: number on top, big pad in the middle, call + delete underneath */
+  .ph-kp { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr) auto; gap: 3vmin; }
+  .ph-kp-info { align-items: center; text-align: center; }
+  .ph-kp-side { flex-direction: row; gap: 10vmin; }
+  .ph-key b { font-size: clamp(24px, 6vw, 52px); }
+  .ph-key small { font-size: clamp(9px, 1.8vw, 14px); }
+  /* contacts and recent: one full-width list, name left, number right */
+  .ph-grid { grid-template-columns: 1fr !important; }
+  .ph-card { flex-wrap: nowrap; padding: 2vmin 1vmin; }
+  .ph-card .ph-name { font-size: clamp(16px, 4.2vw, 30px); }
+}
+@media (max-aspect-ratio: 1/1) {
+  #widget[data-view="phone"] .ph-app { flex: 1 1 auto; align-self: stretch; height: auto; }
+}
+/* The TEXTS screen shares the .ph-app look; keep it out of the PHONE view so the PHONE app gets the whole tile. */
+#widget[data-view="phone"] #txApp { display: none !important; }
+/* Music row standing up: cover + song on top, buttons underneath, so song names aren't cut to "M…". */
+@media (max-aspect-ratio: 1/1) {
+  .mod-music { flex-wrap: wrap; align-content: center; row-gap: 3cqh; }
+  .mu-art { height: 42cqh; }
+  .mu-text { flex: 1 1 0; }
+  .mu-title { font-size: clamp(14px, 11cqh, 34px); }
+  .mu-sub { font-size: clamp(9px, 6.5cqh, 18px); }
+  .mu-ctl { flex: 1 0 100%; justify-content: center; gap: 6vmin; }
+  .mu-btn { width: 24cqh; height: 24cqh; }
+  .mu-play { width: 32cqh; height: 32cqh; }
+}

@@ -20,9 +20,11 @@ labels: bug
 - iCUE version:
 - Stream Deck app version:
 - Windows version:
+- Edge standing up or lying sideways:
+- Using phone features (Phone Link)? yes / no
 
-**mic-guard.log** (last 20 lines, if relevant)
+**Logs** (last 20 lines, if relevant: `mic-guard.log`, `edge-display/phone-action.log`, `edge-display/edge-follow.log`)
 ```
 ```
 
-> Please remove server IDs, usernames, map keys and calendar links before posting.
+> Please remove server IDs, usernames, map keys, calendar links, contact names and phone numbers before posting.

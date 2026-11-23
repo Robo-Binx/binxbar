@@ -75,5 +75,5 @@ if ($onSpeaker) {
 # Tell Binxbar what's playing where (for the button's label).
 $widgetRes = Join-Path ([Environment]::ExpandEnvironmentVariables($cfg['WidgetFolder'])) 'resources'
 try { if (Test-Path $widgetRes) {
-  $j = @{ speaker = [bool]$state; device = "$now"; missing = [bool]$missing; t = [DateTimeOffset]::Now.ToUnixTimeMilliseconds() } | ConvertTo-Json -Compress
+  $j = @{ speaker = [bool]$state; device = "$now"; name = "$Speaker"; missing = [bool]$missing; t = [DateTimeOffset]::Now.ToUnixTimeMilliseconds() } | ConvertTo-Json -Compress
   Set-Content -Path (Join-Path $widgetRes 'speaker.json') -Value $j -Encoding UTF8 } } catch {}

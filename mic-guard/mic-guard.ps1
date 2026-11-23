@@ -223,14 +223,15 @@ public static class MicGuard {
     lock (wlk) { try { string f = Path.Combine(resDir, name); File.WriteAllText(f + ".tmp", text); File.Copy(f + ".tmp", f, true); File.Delete(f + ".tmp"); } catch {} } }
   public static void WriteVol(float v, bool muted) {
     WriteRes("vol.json", "{\"t\":" + (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds + ",\"v\":" + (int)Math.Round(v * 100) + ",\"m\":" + (muted ? "true" : "false") + "}"); }
-  static void EnsureOutVol() {
+  static object volLk = new object();
+  static void EnsureOutVol() { lock (volLk) {
     try { IMMDevice d; if (Enum().GetDefaultAudioEndpoint(0, 1, out d) != 0 || d == null) return;
       string id; d.GetId(out id); if (id == outId && outVol != null) return;
       if (outVol != null) { try { outVol.UnregisterControlChangeNotify(vcb); } catch {} }
       object o; d.Activate(ref IID_VOL, 23, IntPtr.Zero, out o); outVol = (IAudioEndpointVolume)o; outId = id;
       outVol.RegisterControlChangeNotify(vcb);
       float v; int m; outVol.GetMasterVolumeLevelScalar(out v); outVol.GetMute(out m); WriteVol(v, m != 0);
-      Log("watching volume on " + Name(d)); } catch (Exception e) { Log("volume hook failed: " + e.Message); } }
+      Log("watching volume on " + Name(d)); } catch (Exception e) { Log("volume hook failed: " + e.Message); } } }
   static string lastSrc = "";
   static void MediaSourceLoop() {
     string[] names = { "spotify", "chrome", "msedge", "firefox", "opera", "brave", "vivaldi", "arc", "vlc", "itunes", "applemusic", "tidal", "deezer", "amazon music", "foobar2000", "musicbee", "winamp", "aimp", "soundcloud", "youtube music" };
@@ -268,11 +269,111 @@ public static class MicGuard {
         catch (Exception e) { Log("calendar " + (i + 1) + " fetch failed: " + (e is WebException ? ((WebException)e).Status.ToString() : e.GetType().Name)); } }
       if (ok > 0) WriteRes("calendar.ics", all.ToString());
       Thread.Sleep(600000); } }
+  // ---- Phone alerts: texts from chosen people + incoming calls, read from Phone Link's Windows notifications ----
+  // Windows keeps notifications in a small SQLite file; winsqlite3.dll ships with Windows. Only the sender's name
+  // and the kind (text/call) go to the tile; message text never leaves this loop.
+  public static string phoneFrom = "", phoneCalls = "";
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_open_v2(byte[] file, out IntPtr db, int flags, IntPtr vfs);
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_busy_timeout(IntPtr db, int ms);
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_prepare_v2(IntPtr db, byte[] sql, int n, out IntPtr st, IntPtr tail);
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_step(IntPtr st);
+  [DllImport("winsqlite3.dll")] static extern long sqlite3_column_int64(IntPtr st, int i);
+  [DllImport("winsqlite3.dll")] static extern IntPtr sqlite3_column_blob(IntPtr st, int i);
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_column_bytes(IntPtr st, int i);
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_finalize(IntPtr st);
+  [DllImport("winsqlite3.dll")] static extern int sqlite3_close_v2(IntPtr db);
+  static byte[] U8(string s) { return Encoding.UTF8.GetBytes(s + "\0"); }
+  // Runs a query and returns rows of (id, payload text).
+  static List<KeyValuePair<long, string>> Wpn(string sql) {
+    var rows = new List<KeyValuePair<long, string>>(); IntPtr db, st;
+    string f = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\Windows\Notifications\wpndatabase.db");
+    if (sqlite3_open_v2(U8(f), out db, 1 /* read-only */, IntPtr.Zero) != 0) { sqlite3_close_v2(db); return null; }
+    try { sqlite3_busy_timeout(db, 1500);
+      if (sqlite3_prepare_v2(db, U8(sql), -1, out st, IntPtr.Zero) != 0) return null;
+      try { while (sqlite3_step(st) == 100) {
+          int n = sqlite3_column_bytes(st, 1); string payload = "";
+          if (n > 0) { var b = new byte[n]; Marshal.Copy(sqlite3_column_blob(st, 1), b, 0, n); payload = Encoding.UTF8.GetString(b); }
+          rows.Add(new KeyValuePair<long, string>(sqlite3_column_int64(st, 0), payload)); } }
+      finally { sqlite3_finalize(st); } }
+    finally { sqlite3_close_v2(db); }
+    return rows; }
+  static List<string> ToastTexts(string xml) {
+    var l = new List<string>();
+    foreach (Match m in Regex.Matches(xml, "<text[^>]*>([^<]*)</text>")) { string t = WebUtility.HtmlDecode(m.Groups[1].Value).Trim(); if (t.Length > 0) l.Add(t); }
+    return l; }
+  static string J(string s) { return (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", " ").Replace("\n", " "); }
+  static void WritePhone(long id, string kind, string who, bool active) {
+    WriteRes("phone.json", "{\"t\":" + (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds + ",\"id\":" + id + ",\"kind\":\"" + kind + "\",\"who\":\"" + J(who) + "\",\"active\":" + (active ? "true" : "false") + "}"); }
+  static void SaveText(long id, string who, string body) {
+    try { string f = Path.Combine(resDir, "texts.jsonl");
+      File.AppendAllText(f, "{\"id\":" + id + ",\"t\":" + (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds + ",\"who\":\"" + J(who) + "\",\"body\":\"" + J(body) + "\"}\n");
+      var lines = File.ReadAllLines(f); if (lines.Length > 800) { var keep = new string[500]; Array.Copy(lines, lines.Length - 500, keep, 0, 500); File.WriteAllLines(f, keep); }
+    } catch {} }
+  static void PhoneLoop() {
+    // Every new notification, tagged with the app that posted it; Phone Link's are the ones we act on.
+    const string q = "SELECT n.Id, IFNULL(h.PrimaryId, '?') || char(1) || IFNULL(CAST(n.Payload AS TEXT), '') FROM Notification n LEFT JOIN NotificationHandler h ON h.RecordId = n.HandlerId WHERE 1=1 ";
+    string[] from = phoneFrom.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+    for (int i = 0; i < from.Length; i++) from[i] = from[i].Trim().ToLowerInvariant();
+    bool calls = phoneCalls.Trim().ToLowerInvariant() == "on";
+    long last = -1, callId = 0; string callWho = ""; bool warned = false; int seen = 0;
+    while (true) {
+      try {
+        if (last < 0) { var r0 = Wpn("SELECT IFNULL(MAX(Id), 0), '' FROM Notification"); if (r0 != null && r0.Count > 0) { last = r0[0].Key; Log("phone alerts: reading Windows notifications OK");
+            // One-time check of the last few Phone Link notifications already stored: shape only, all words masked.
+            var r1 = Wpn("SELECT n.Id, IFNULL(n.Type, '?') || char(1) || IFNULL(CAST(n.Payload AS TEXT), '') FROM Notification n JOIN NotificationHandler h ON h.RecordId = n.HandlerId WHERE h.PrimaryId LIKE '%YourPhone%' ORDER BY n.Id DESC LIMIT 4");
+            if (r1 != null) foreach (var x in r1) { int c1 = x.Value.IndexOf('\u0001'); string ty = c1 >= 0 ? x.Value.Substring(0, c1) : "?", px = c1 >= 0 ? x.Value.Substring(c1 + 1) : x.Value;
+              string sh = px.Replace("\0", ""); sh = Regex.Replace(sh, ">[^<]+<", ">#<"); sh = Regex.Replace(sh, "=\"[^\"]*\"", "=\"\""); sh = Regex.Replace(sh, "=\'[^\']*\'", "=''");
+              Log("  stored phone link notification type=" + ty + " (" + px.Length + " chars, nulls=" + (px.IndexOf('\0') >= 0) + ", texts=" + ToastTexts(px).Count + "): " + (sh.Length > 500 ? sh.Substring(0, 500) : sh)); } } else if (!warned) { Log("phone alerts: can't open Windows notifications"); warned = true; } }
+        else {
+          var rows = Wpn(q + "AND n.Id > " + last + " ORDER BY n.Id");
+          if (rows == null) { if (!warned) { Log("phone alerts: can't read Windows notifications yet"); warned = true; } }
+          else foreach (var row in rows) {
+            last = Math.Max(last, row.Key);
+            int cut = row.Value.IndexOf('\u0001'); string app = cut >= 0 ? row.Value.Substring(0, cut) : "?", xml = cut >= 0 ? row.Value.Substring(cut + 1) : row.Value;
+            var texts = ToastTexts(xml); seen++;
+            if (seen <= 40) Log("notification from " + app + " (" + texts.Count + " lines)");   // app name only; no names or message text
+            string al = app.ToLowerInvariant();
+            if (!(al.Contains("yourphone") || al.Contains("phonelink") || al.Contains("phoneexperience"))) continue;
+            if (texts.Count == 0) {
+              if (seen <= 40) {   // shape only: every word and attribute value masked, so no names or message text
+                string shape = xml.Replace("\0", "");
+                shape = Regex.Replace(shape, ">[^<]+<", ">#<"); shape = Regex.Replace(shape, "=\"[^\"]*\"", "=\"\""); shape = Regex.Replace(shape, "=\'[^\']*\'", "=''");
+                Log("  shape (" + xml.Length + " chars, nulls=" + (xml.IndexOf('\0') >= 0) + "): " + (shape.Length > 400 ? shape.Substring(0, 400) : shape)); }
+              continue; }
+            bool isMissed = texts.Exists(t => t.ToLowerInvariant().Contains("missed call"));
+            bool isCall = !isMissed && (xml.Contains("incomingCall") || texts.Exists(t => t.ToLowerInvariant().Contains("incoming call")));
+            if (isMissed && calls) {
+              string who = texts.Find(t => !t.ToLowerInvariant().Contains("missed call") && !t.ToLowerInvariant().Contains("phone link")) ?? "Unknown";
+              if (callId > 0) callId = 0;
+              WritePhone(row.Key, "missed", who, true); Log("phone alert: missed call");
+            } else if (isCall && calls) {
+              string who = texts.Find(t => !t.ToLowerInvariant().Contains("incoming call") && !t.ToLowerInvariant().Contains("phone link")) ?? "Unknown";
+              callId = row.Key; callWho = who; WritePhone(row.Key, "call", who, true); Log("phone alert: call");
+              // Phone Link fills the caller's name in separately ("{contactName}"); read it off the pop-up instead.
+              if (who.StartsWith("{")) { try { WriteRes("phone-who.txt", "");
+                  string pk = Path.Combine(Path.GetDirectoryName(logPath), "phone-peek.vbs"); if (!File.Exists(pk)) pk = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(logPath), "..", "edge-display", "phone-peek.vbs"));
+                  Process.Start("wscript.exe", "\"" + pk + "\""); } catch {} }
+            } else if (!isCall && al.Contains("messages") && texts.Count >= 2) {
+              string sender = texts[0], low = sender.ToLowerInvariant();
+              if (from.Length > 0) foreach (string f in from) if (f == "*" || (f.Length > 0 && low.Contains(f))) { WritePhone(row.Key, "text", sender, true); Log("phone alert: text"); break; }
+            } else if (!isCall && from.Length > 0) {
+              string sender = texts[0], low = sender.ToLowerInvariant();
+              foreach (string f in from) if (f == "*" || (f.Length > 0 && low.Contains(f))) { WritePhone(row.Key, "text", sender, true); Log("phone alert: text"); break; }
+            } }
+          // A call alert stays up until Phone Link removes the call notification (answered, declined or missed).
+          if (callId > 0) { var still = Wpn("SELECT Id, '' FROM Notification WHERE Id = " + callId);
+            if (still != null && still.Count == 0) { WritePhone(callId, "call", callWho, false); callId = 0; } }
+        }
+      } catch (Exception e) { if (!warned) { Log("phone alerts error: " + e.Message); warned = true; } }
+      Thread.Sleep(1500); } }
   static void StartExtras(string outFile, string lounge, string cal) {
     resDir = Path.GetDirectoryName(outFile); loungeId = (lounge ?? "").Trim(); calUrl = (cal ?? "").Trim();
     EnsureOutVol();
     var a = new Thread(MediaSourceLoop); a.IsBackground = true; a.Start();
+    // Follow the default speaker when it changes (e.g. the SPEAKER button), so the volume bar reads the right device.
+    var v = new Thread(() => { while (true) { Thread.Sleep(2000); EnsureOutVol(); } }); v.IsBackground = true; v.Start();
     if (loungeId.Length > 0) { var b = new Thread(LoungeLoop); b.IsBackground = true; b.Start(); Log("lounge feed on for server " + loungeId); }
+    if (phoneFrom.Trim().Length > 0 || phoneCalls.Trim().ToLowerInvariant() == "on") { var p = new Thread(PhoneLoop); p.IsBackground = true; p.Start(); Log("phone alerts on"); }
     if (calUrl.Length > 0) { var c = new Thread(CalendarLoop); c.IsBackground = true; c.Start(); Log("calendar sync on (" + calUrl.Split(new[] { ' ', ',', ';', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length + " calendar(s))"); } }
   public static void Run(string outFile, string logFile, string names, string lounge, string cal) {
     outPath = outFile; logPath = logFile; mainNames = names.ToLowerInvariant().Split(',');
@@ -291,7 +392,7 @@ public static class MicGuard {
 '@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 # Settings live in mic-guard.ini next to this script.
-$cfg = @{ MainMic = 'CHANGE_ME'; WidgetFolder = '%APPDATA%\Corsair\CUE5\html_widgets\com\personal\binxbar'; LoungeServerId = ''; CalendarUrl = '' }
+$cfg = @{ MainMic = 'CHANGE_ME'; WidgetFolder = '%APPDATA%\Corsair\CUE5\html_widgets\com\personal\binxbar'; LoungeServerId = ''; CalendarUrl = ''; PhoneAlertsFrom = ''; PhoneCalls = 'off' }
 $ini = Join-Path $here 'mic-guard.ini'
 if (Test-Path $ini) { foreach ($line in Get-Content $ini) {
     if ($line -match '^\s*([A-Za-z]+)\s*=\s*(.+?)\s*$' -and $line -notmatch '^\s*;') { $cfg[$matches[1]] = $matches[2] } } }
@@ -299,5 +400,6 @@ $widget = [Environment]::ExpandEnvironmentVariables($cfg['WidgetFolder'])
 $out  = Join-Path $widget 'resources\mic2.json'
 try {
   Add-Type -TypeDefinition $cs -Language CSharp -IgnoreWarnings
+  [MicGuard]::phoneFrom = $cfg['PhoneAlertsFrom']; [MicGuard]::phoneCalls = $cfg['PhoneCalls']
   [MicGuard]::Run($out, (Join-Path $here 'mic-guard.log'), $cfg['MainMic'], $cfg['LoungeServerId'], $cfg['CalendarUrl'])
 } catch { Add-Content (Join-Path $here 'mic-guard.log') ("crash: " + $_) }

@@ -127,7 +127,7 @@
 
     // Closed loop: press a volume key, re-read the real level, repeat until it lands on the target.
     // Works whatever step size the PC uses, and corrects any overshoot.
-    var pressing = false, want = null, tries = 0, lastSeen = null;
+    var pressing = false, want = null, tries = 0, lastSeen = null, stuck = 0, lastV = null;
     function realVol() {
         return fetch("resources/vol.json?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.json() : null)
             .then(j => (j && typeof j.v === "number") ? j : null).catch(() => null);
@@ -135,7 +135,8 @@
     function pump() {
         realVol().then(j => {
             if (j) { vol = j.v; volMuted = !!j.m; drawVol(); }
-            const done = !j || want === null || Math.abs(vol - want) <= 1 || tries++ > 70 ||
+            if (j && j.v === lastV) stuck++; else stuck = 0; lastV = j ? j.v : null;
+            const done = !j || want === null || Math.abs(vol - want) <= 1 || tries++ > 70 || stuck >= 6 ||   // level not moving: wrong device, stop
                          (lastSeen !== null && (vol > want) !== lastSeen);   // crossed the target: stop
             if (done) { pressing = false; want = null; target.style.opacity = "0"; return; }
             lastSeen = vol > want;
@@ -147,7 +148,7 @@
         const r = bar.getBoundingClientRect();
         want = Math.round(Math.max(0, Math.min(1, (clientX - r.left) / r.width)) * 100);
         target.style.left = want + "%"; target.style.opacity = "1";
-        tries = 0; lastSeen = null;
+        tries = 0; lastSeen = null; stuck = 0; lastV = null;
         if (!pressing) { pressing = true; pump(); }
     }
     $("muVol").addEventListener("pointerup", e => { e.stopPropagation(); setVolumeAt(e.clientX); });
@@ -157,18 +158,20 @@
     const SPEAKER_KEY = 19;
     const outBtn = $("muOut"), outLabel = $("muOutLabel");
     let outBusy = 0;
+    function outText(now, next) { outLabel.innerHTML = "<b>" + now + "</b><span>" + next + "</span>"; }
     function readOut() {
         if (!outBtn) return;
         fetch("resources/speaker.json?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => {
             if (!j || Date.now() < outBusy) return;
-            const m = /\(([^)]+)\)/.exec(String(j.device || "")), short = m ? m[1].split(/\s+/)[0].toUpperCase() : "SPEAKER";
+            const m = /\(([^)]+)\)/.exec(String(j.device || ""));
+            const spk = String(j.name || (j.speaker && m ? m[1].split(/\s+/)[0] : "") || "speaker").toUpperCase().slice(0, 10);
             outBtn.classList.toggle("on", !!j.speaker);
-            outLabel.textContent = j.speaker ? short.slice(0, 9) : "HEADSET";
-            if (j.missing && Date.now() - j.t < 8000) { outLabel.textContent = "NO SPEAKER"; setTimeout(readOut, 3000); }
+            if (j.speaker) outText("PLAYING " + spk, "SWITCH"); else outText("PLAYING HEADSET", "SWITCH");
+            if (j.missing && Date.now() - j.t < 8000) { outText("NO " + spk, "IS IT ON?"); setTimeout(readOut, 3000); }
         }).catch(() => {});
     }
     if (outBtn) tap(outBtn, () => {
-        if (!(window.Binxbar && window.Binxbar.tapKey(SPEAKER_KEY))) { outLabel.textContent = "CAN'T"; setTimeout(readOut, 2500); return; }
+        if (!(window.Binxbar && window.Binxbar.tapKey(SPEAKER_KEY))) { outText("CAN'T", "TRY AGAIN"); setTimeout(readOut, 2500); return; }
         outBusy = Date.now() + 1500; outBtn.classList.add("pending");
         [1600, 3000, 5000].forEach(ms => setTimeout(readOut, ms)); setTimeout(() => outBtn.classList.remove("pending"), 5200);
     });

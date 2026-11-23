@@ -17,7 +17,8 @@
         try { const v = Function("return typeof " + name + " !== 'undefined' ? " + name + " : undefined")(); if (v !== undefined && v !== null) return v; } catch (e) {}
         return window[name];
     }
-    const me = () => String(prop("myDiscordName") || "").trim().toLowerCase();
+    const metaDefault = n => { const m = document.querySelector('meta[content="' + n + '"]'); return m ? String(m.getAttribute("data-default") || "").replace(/^'|'$/g, "") : ""; };
+    const me = () => String(prop("myDiscordName") || metaDefault("myDiscordName") || "").trim().toLowerCase();
     const short = (s, n) => { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
     const clean = s => String(s || "").replace(/^[\s\-\u2013\u2014|]+|[\s\-\u2013\u2014|]+$/g, "") || String(s || "");
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -30,7 +31,7 @@
     const norm = n => clean(n).toLowerCase().replace(/\s+/g, " ").trim();
     function joinList() {
         let v = prop("joinChannels");
-        if (v === undefined || v === null) {   // setting not loaded yet (e.g. added to an existing install): use its default
+        if (v === undefined || v === null || !String(v).trim()) {   // setting blank or not loaded yet (e.g. after a re-import): use its default
             const m = document.querySelector('meta[content="joinChannels"]'); v = m ? String(m.getAttribute("data-default") || "").replace(/^'|'$/g, "") : "";
         }
         return String(v || "").split(",").map(norm).filter(Boolean);
@@ -57,7 +58,7 @@
     function drawDc(msg) {
         if (!dc) return;
         dc.classList.toggle("dc-on", !!myChan);
-        dcLabel.innerHTML = msg || (myChan ? "DISCONNECT<br>DISCORD" : "NOT IN<br>VOICE");
+        dcLabel.innerHTML = msg || (myChan ? "ESCAPE<br>DISCORD" : "NOT IN<br>VOICE");
     }
     if (dc && window.Binxbar) window.Binxbar.onTap(dc, () => {
         if (!window.Binxbar.tapKey(DISCONNECT_KEY)) { drawDc("CAN'T"); setTimeout(() => drawDc(), 2500); return; }

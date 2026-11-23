@@ -1,4 +1,4 @@
-// Calendar module: tap the date to open a month grid + that day's events.
+// Calendar module: tap the date to open a week view (7 days with their events) or a month grid + that day's events.
 // Events come from a Google Calendar "secret address in iCal format" pasted into the widget settings.
 (() => {
     "use strict";
@@ -11,6 +11,9 @@
 
     let events = [], status = "none", lastUrl = null, timer = 0, backTimer = 0;
     let shown = new Date(), selected = new Date();
+    let mode = (() => { try { return localStorage.getItem("binxbar.cal.mode") || "month"; } catch (e) { return "month"; } })();
+    const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    const MON3 = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     const key = d => d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     const sameDay = (a, b) => key(a) === key(b);
@@ -115,9 +118,68 @@
         ).sort((a, b) => (b.allDay - a.allDay) || (a.start - b.start));
     }
 
+    // WEEK / MONTH switch, shown in both views
+    function tabs() {
+        const t = el("div", "cal-tabs");
+        [["week", "WEEK"], ["month", "MONTH"]].forEach(([m, label]) => {
+            const b = el("span", "fc-btn" + (mode === m ? " on" : ""), label);
+            b.addEventListener("click", ev => { ev.stopPropagation(); mode = m; try { localStorage.setItem("binxbar.cal.mode", m); } catch (e) {} if (m === "month") shown = new Date(selected.getFullYear(), selected.getMonth(), 1); touch(); render(); });
+            t.append(b);
+        });
+        return t;
+    }
+    function backBtn() {
+        const back = el("span", "fc-btn fc-arrow"); back.setAttribute("aria-label", "Back"); back.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="20" y1="12" x2="4.5" y2="12"></line><polyline points="10.5 5.5 4 12 10.5 18.5"></polyline></svg>';
+        back.addEventListener("click", ev => { ev.stopPropagation(); close(); });
+        return back;
+    }
+    function statusNote() {
+        if (status === "none") return "Add your Google Calendar link to mic-guard.ini (CalendarUrl) to see events.";
+        if (status === "error") return "Couldn't load your calendar.";
+        return "";
+    }
+
+    function renderWeek(box) {
+        box.classList.add("wk");
+        const ws = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate() - selected.getDay());
+        const we = new Date(ws); we.setDate(ws.getDate() + 6);
+        const head = el("div", "wk-head");
+        const prev = el("span", "cal-nav", "\u25C2"), next = el("span", "cal-nav", "\u25B8");
+        const range = MON3[ws.getMonth()] + " " + ws.getDate() + " \u2013 " + (we.getMonth() !== ws.getMonth() ? MON3[we.getMonth()] + " " : "") + we.getDate();
+        const title = el("span", "cal-title", range);
+        prev.addEventListener("click", ev => { ev.stopPropagation(); selected = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() - 7); touch(); render(); });
+        next.addEventListener("click", ev => { ev.stopPropagation(); selected = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 7); touch(); render(); });
+        const nav = el("div", "wk-nav"); nav.append(prev, title, next);
+        const right = el("div", "wk-right"); right.append(tabs(), backBtn());
+        head.append(nav, right);
+        const grid = el("div", "wk-grid");
+        const today = new Date(), note = statusNote();
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(ws); d.setDate(ws.getDate() + i);
+            const col = el("div", "wk-col" + (sameDay(d, today) ? " today" : ""));
+            const dh = el("div", "wk-dh"); dh.append(el("span", "wk-dname", DAYS[i]), el("span", "wk-dnum", String(d.getDate())));
+            col.append(dh);
+            if (!note) {
+                const evs = dayEvents(d), MAX = 4;
+                evs.slice(0, MAX).forEach(o => {
+                    const e = el("div", "wk-ev");
+                    e.append(el("span", "wk-ev-time", o.allDay ? "ALL DAY" : o.start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).replace(":00", "")), el("span", "wk-ev-title", o.title));
+                    col.append(e);
+                });
+                if (evs.length > MAX) col.append(el("div", "wk-more", "+" + (evs.length - MAX) + " more"));
+            }
+            col.addEventListener("click", ev => { ev.stopPropagation(); selected = d; mode = "month"; shown = new Date(d.getFullYear(), d.getMonth(), 1); touch(); render(); });
+            grid.append(col);
+        }
+        box.append(head, grid);
+        if (note) box.append(el("div", "cal-note", note));
+        else if (status === "stale") box.append(el("div", "cal-note", "Offline: showing last sync."));
+    }
+
     function render() {
         const box = $("cal"); if (!box) return;
-        box.replaceChildren();
+        box.replaceChildren(); box.classList.remove("wk");
+        if (mode === "week") { renderWeek(box); return; }
         const y = shown.getFullYear(), m = shown.getMonth();
         const first = new Date(y, m, 1), start = new Date(first); start.setDate(1 - first.getDay());
         const monthEnd = new Date(y, m + 1, 1);
@@ -150,9 +212,8 @@
         const right = el("div", "cal-right");
         const label = sameDay(selected, today) ? "TODAY" : selected.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }).toUpperCase();
         const rhead = el("div", "cal-rhead");
-        const back = el("span", "fc-btn fc-arrow"); back.setAttribute("aria-label", "Back"); back.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="20" y1="12" x2="4.5" y2="12"></line><polyline points="10.5 5.5 4 12 10.5 18.5"></polyline></svg>';
-        back.addEventListener("click", ev => { ev.stopPropagation(); close(); });
-        rhead.append(el("div", "cal-agenda-title", label), back);
+        const rr = el("div", "wk-right"); rr.append(tabs(), backBtn());
+        rhead.append(el("div", "cal-agenda-title", label), rr);
         right.append(rhead);
         const list = el("div", "cal-list");
         if (status === "none") list.append(el("div", "cal-note", "Add your Google Calendar link to mic-guard.ini (CalendarUrl) to see events."));

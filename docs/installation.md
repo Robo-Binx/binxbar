@@ -28,6 +28,7 @@ Already built into Windows, nothing to install: **PowerShell** (runs the helper 
 1. Open **iCUE** → click your **Xeneon Edge** → **Widgets**.
 2. Click **+** (import) and pick `Binxbar-x.y.z.icuewidget`.
 3. Drag **Binxbar** onto the Edge. It's built for the **M** size in the left column.
+4. **Standing the Edge up?** Binxbar works both ways. Set the Edge's orientation to portrait in iCUE's screen settings for the Edge; the tile rearranges itself (buttons stack, the clock stays on one line, the PHONE app fills the tile). Nothing to change in Binxbar.
 
 ### 2. Tell it which mic is yours
 Click the tile in iCUE to open its settings:
@@ -63,7 +64,7 @@ If it doesn't, see [Troubleshooting](troubleshooting.md).
 
 It doesn't poll or use CPU in the background: it sleeps until Windows reports a mic change.
 
-### 6. Voice bubbles, tap-to-join, stream and disconnect (optional)
+### 6. Voice bubbles, tap-to-join, stream and ESCAPE DISCORD (optional)
 Shows one small bubble per voice channel with people in it (`GENERAL  YOU, ALEX, SAM`), and a *NAME JOINED CHANNEL* bubble when someone hops in. The channel you just left stays as a dimmed bubble for 10 minutes so you can tap back in. Bubbles for your **Tap-to-Join Channels** are tappable: one tap moves you there.
 
 - **STREAM GAME** goes live in your current call with the game Discord sees you playing. It blinks green while you stream; tap again to stop. (Discord pauses a game stream while the game isn't the window in front.)

@@ -88,7 +88,7 @@ Stream Deck app → device **iCUE Widget N** → **page 1** → grid is **8 acro
 | 1 | System → Multimedia | Mute |
 | 2 | Audio Mute → Toggle Mute | the **desk mic** by name |
 | 3 | System → Open | `BINX\edge-display\bright-down.vbs` |
-| 4 | Discord → Voice Channel | leave Server on **None (Leave any active channel)** = DISCONNECT |
+| 4 | Discord → Voice Channel | leave Server on **None (Leave any active channel)** = ESCAPE DISCORD |
 | 5–8 | Discord → Voice Channel | Server: theirs; channels 1–4 from *Tap-to-Join Channels* |
 | 9 | System → Open | `BINX\edge-display\bright-up.vbs` |
 | 10 | System → Multimedia | Decrease Volume |

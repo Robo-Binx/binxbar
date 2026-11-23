@@ -8,7 +8,7 @@ Binxbar talks to the outside world by pressing keys on a virtual Stream Deck (iC
 
 ```
         col 1        col 2        col 3        col 4         col 5      col 6      col 7      col 8
-row 1   SOUND MUTE   MIC MUTE     BRT -        DISCONNECT    CHANNEL 1  CHANNEL 2  CHANNEL 3  CHANNEL 4
+row 1   SOUND MUTE   MIC MUTE     BRT -        ESCAPE DISC   CHANNEL 1  CHANNEL 2  CHANNEL 3  CHANNEL 4
 row 2   BRT +        VOL -        VOL +        CHANNEL 5     STREAM     SPEAKER    ANSWER     DECLINE
 row 3   PLAYER       DESK MIC     IN-CALL      CALL BACK     PHONE      -          -          -
 row 4   HEADSET MIC  HEADSET MUTE -            -             -          -          -          -
@@ -19,7 +19,7 @@ row 4   HEADSET MIC  HEADSET MUTE -            -             -          -       
 | 1 · SOUND MUTE | System → **Multimedia** | Mute |
 | 2 · MIC MUTE | Audio Mute → **Toggle Mute** | Device: **your mic** (pick it by name, not "default") |
 | 3 · BRT − | System → **Open** | `edge-display\bright-down.vbs` |
-| 4 · DISCONNECT | Discord → **Voice Channel** | Leave Server on **None (Leave any active channel)** |
+| 4 · ESCAPE DISCORD | Discord → **Voice Channel** | Leave Server on **None (Leave any active channel)** |
 | 5, 6, 7, 8 · CHANNEL 1–4 | Discord → **Voice Channel** | Server: yours. Voice Channel: the 1st–4th name in *Tap-to-Join Channels* |
 | 9 · BRT + | System → **Open** | `edge-display\bright-up.vbs` |
 | 10 · VOL − | System → **Multimedia** | Decrease Volume |

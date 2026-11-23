@@ -10,7 +10,9 @@ Mic and Discord controls, phone calls, a music player, screen controls and a liv
 ![Platform](https://img.shields.io/badge/platform-Windows-0078d4)
 ![iCUE](https://img.shields.io/badge/iCUE-5.52%2B-yellow)
 
-![Binxbar on the Xeneon Edge](docs/images/binxbar.jpg)
+![Binxbar on the Xeneon Edge, standing up and lying sideways](docs/images/binxbar.jpg)
+
+<sub>Standing up (portrait) and lying sideways. Names, songs and weather in these pictures are made-up examples.</sub>
 
 [**Download**](https://github.com/Robo-Binx/binxbar/releases/latest) · [Installation](docs/installation.md) · [Phone](docs/phone.md) · [Stream Deck keys](docs/stream-deck-keys.md) · [Privacy](docs/privacy.md) · [Troubleshooting](docs/troubleshooting.md) · [AI-assisted setup](docs/ai-setup.md)
 
@@ -40,13 +42,10 @@ Mic and Discord controls, phone calls, a music player, screen controls and a liv
 | ⌨️ **Keyboard keys** *(new)* | One key turns the Edge on/off, another flips it between Binxbar and your Windows desktop. |
 | ↕️ **Upright or sideways** *(new)* | Works with the Edge standing up (portrait) as well as lying sideways. |
 
-<table><tr>
-<td><img src="docs/images/controls.jpg" alt="Mic row"></td>
-<td><img src="docs/images/radar-wind.jpg" alt="Weather station"></td>
-</tr><tr>
-<td align="center">Mic row: GO MOBILE, STREAM and ESCAPE DISCORD on the left; sound, MUTE ALL and SPEAKER on the right</td>
-<td align="center">Weather station: wind layer over your area</td>
-</tr></table>
+<p align="center"><img src="docs/images/phone.jpg" alt="Phone: incoming call, keypad and contacts" width="900"></p>
+<p align="center"><sub>Phone: an incoming call takes over the tile · the KEYPAD (spells names too) · CONTACTS with search, A–Z, ★ favorites and 🔔 alerts</sub></p>
+
+<p align="center"><img src="docs/images/radar-wind.jpg" alt="Weather station" width="600"><br><sub>Weather station: live radar and a wind layer over your area</sub></p>
 
 ## Quick start
 

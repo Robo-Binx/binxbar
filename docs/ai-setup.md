@@ -104,7 +104,7 @@ Stream Deck app → device **iCUE Widget N** → **page 1** → grid is **8 acro
 
 Remind them: keep the Stream Deck app on **page 1**; skip 3/9 without brightness, 14 without a speaker, 25/26 without GO MOBILE, and unused channel keys. Copy-paste (Ctrl+C / Ctrl+V) a finished Voice Channel key to make the others faster.
 
-**Test:** tap the big panel on the Edge → MUTED → tap → LIVE. Join a Discord voice channel → "ON DISCORD". Tap DISCONNECT DISCORD → they leave the call.
+**Test:** tap the big panel on the Edge → MUTED → tap → LIVE. Join a Discord voice channel → "ON DISCORD". Tap ESCAPE DISCORD → they leave the call.
 
 ### Step 6. Configure and start mic-guard (you can do this)
 Edit `BINX\mic-guard\mic-guard.ini`:
@@ -148,3 +148,9 @@ Use [troubleshooting.md](troubleshooting.md). The most common fixes:
 4. A mic word matches the wrong device. Make it more specific.
 
 When everything works, have them try: tap to mute, the volume bar, double-tapping the music row, the weather → RADAR tab, and (if set up) GO MOBILE.
+
+
+## Optional extras added in 1.2
+- **Screen keys and monitor follow:** have the user set `MonitorID` in `edge-display\edge-display.ini`, then double-click `edge-display\edge-follow.vbs` (it adds itself to startup). See docs/installation.md, "Screen follows your main monitor".
+- **Phone:** walk them through docs/phone.md. The Phone Link pairing, Bluetooth PIN, phone permissions and Windows notification settings must be done by the user (they need their phone in hand). You can set `PhoneCalls` / `PhoneAlertsFrom` in `mic-guard.ini`, the Stream Deck keys 15, 16, 20, 21, and run `tools\import-contacts.ps1` on their Google Contacts export.
+- **Privacy:** tell the user that contacts, recent calls and alert picks stay on their PC only (docs/privacy.md). Never copy their contacts, numbers or messages anywhere else.

@@ -18,6 +18,7 @@ Everything here is **free**. Windows only (iCUE widgets don't run on Mac).
 | 6 | **Twinkle Tray** | Changes the Edge's brightness (and can turn it off/on). | [twinkletray.com](https://twinkletray.com), or the Microsoft Store | Only for the brightness swipe |
 | 7 | A **free CARTO map key** | The street map under the radar. It's a sign-up, not a program: you get the key by email in about a minute. | [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey/) | Only for the radar map |
 | 8 | A music app (Spotify, a browser, VLC…) | Whatever you already use. Anything that shows up in Windows' media pop-up works. | — | Only for the music row |
+| 9 | **Microsoft Phone Link** + your phone + Bluetooth on the PC | Calls, call/text alerts and the PHONE app. Phone Link is already in Windows 10/11; the phone gets **Link to Windows**. | Start menu → Phone Link | Only for the phone features |
 
 Already built into Windows, nothing to install: **PowerShell** (runs the helper scripts) and **Windows Script Host** (the `.vbs` files that start them without a window popping up).
 
@@ -66,7 +67,7 @@ It doesn't poll or use CPU in the background: it sleeps until Windows reports a 
 Shows one small bubble per voice channel with people in it (`GENERAL  YOU, ALEX, SAM`), and a *NAME JOINED CHANNEL* bubble when someone hops in. The channel you just left stays as a dimmed bubble for 10 minutes so you can tap back in. Bubbles for your **Tap-to-Join Channels** are tappable: one tap moves you there.
 
 - **STREAM GAME** goes live in your current call with the game Discord sees you playing. It blinks green while you stream; tap again to stop. (Discord pauses a game stream while the game isn't the window in front.)
-- **DISCONNECT DISCORD** leaves any call, DMs included.
+- **ESCAPE DISCORD** leaves any call, DMs included.
 
 Point the bubbles at **any server where you have Manage Server**:
 
@@ -93,6 +94,22 @@ Binxbar is a control station, so set up both parts.
 3. Prefer a macro key or a real Stream Deck? Point it at `edge-display\toggle.vbs` (or `off.vbs` / `on.vbs`). For a macro key, make a shortcut to `wscript.exe "C:\...\edge-display\toggle.vbs"` and launch that.
 
 Just want it dark, not off? Use the 10% preset.
+
+### Screen follows your main monitor, and a key to switch widgets / desktop
+`edge-display\edge-follow` is a small hidden helper that adds three things:
+
+1. **The Edge follows your main monitor's power button.** Switch your main monitor off with its own button and Windows loses it; the helper notices within a few seconds and turns the Edge off too (the same way the on/off key does), so your windows don't get dumped onto the Edge. Switch the main monitor back on and the Edge comes back at its last brightness. If iCUE lost the widgets while the screen was off, the helper brings them back by itself (it re-shows them, and restarts iCUE only if it has to).
+2. **Number-pad minus (–) flips the Edge between Binxbar and your Windows desktop.** It sits right above **Number-pad +** (on/off, from step 7), so the two Edge keys are together. Num Lock stays a normal key. While the helper runs, number-pad minus is used only for this (it no longer types a "–").
+3. **Call status for the PHONE app** (see [Phone](phone.md)).
+
+Setup: make sure `edge-display\edge-display.ini` has your `MonitorID` (step 7), then double-click **`edge-display\edge-follow.vbs`** once. Nothing appears. It adds itself to your Windows startup (a small launcher in `shell:startup` named *Binxbar edge follows monitor*; delete it there to stop it). Its log is `edge-display\edge-follow.log`.
+
+> Works with monitors that disappear from Windows when switched off (most DisplayPort and many HDMI monitors). If yours stays "connected" while off, the helper can't tell, and you'll just use the on/off key.
+
+### Phone: calls, alerts and the PHONE app (optional)
+Link your phone with Microsoft Phone Link, then follow **[docs/phone.md](phone.md)**: Bluetooth calls, notifications, `PhoneCalls` / `PhoneAlertsFrom` in `mic-guard.ini`, Stream Deck keys 15, 16, 20, 21 and importing your contacts.
+
+> 🔒 Everything Binxbar keeps for this (contacts, recent calls, who can pop up) stays **on your PC** and is only used by Binxbar. See [privacy.md](privacy.md).
 
 ### Google Calendar (optional, view only)
 Tap the date on the clock to open the month calendar. To show your events on it:

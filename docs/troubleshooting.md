@@ -12,9 +12,14 @@
 | Music row never shows anything | Restart iCUE once after installing (it loads the Media plugin). The player has to show in Windows' media pop-up. |
 | Brightness changes the wrong screen | Wrong `MonitorID` in `edge-display.ini`. |
 | Tapping a bubble does nothing | Its channel must be in *Tap-to-Join Channels*, spelled like Discord shows it, and its key (5–8, 12) must be a Voice Channel action for that channel. |
-| STREAM GAME / DISCONNECT do nothing | Keys 13 / 4, Discord plugin authorized, Stream Deck on page 1. Streaming needs you in a voice call. |
+| STREAM GAME / ESCAPE DISCORD do nothing | Keys 13 / 4, Discord plugin authorized, Stream Deck on page 1. Streaming needs you in a voice call. |
 | GO MOBILE says MUTED and won't unmute | Key 26 must be **Audio Mute → Toggle Mute** on the **headset** mic. Unmute the headset once in Windows sound settings. (Some headsets' own mute button isn't visible to Windows; use the tile instead.) |
 | Calendar shows no events | Check `CalendarUrl=` in `mic-guard.ini` (the *Secret address in iCal format*, ending in `basic.ics`), run `restart-mic-guard.vbs`, and look in `mic-guard.log` for `calendar sync on`. |
+
+| The Edge doesn't turn off with the main monitor | `edge-follow.vbs` must be running (see `edge-display\edge-follow.log`) and `MonitorID` set in `edge-display.ini`. Some monitors stay connected to Windows when switched off; then use the on/off key. |
+| Number-pad minus doesn't switch widgets / desktop | `edge-follow.vbs` isn't running. Double-click it, or check `edge-follow.log`. |
+| Phone: calls, alerts, PHONE app | See the troubleshooting table in [Phone](phone.md#troubleshooting). |
+| Widgets look squeezed with the Edge standing up | Binxbar adapts to portrait automatically; re-import the latest `.icuewidget` if you're on an old version. |
 
 **Updating:** download the new `.icuewidget`, delete the old Binxbar tile from the Edge, import the new file, drag it back on, and re-pick **Tap-to-Mute Device**. Your Stream Deck keys and mic-guard settings stay as they are.
 

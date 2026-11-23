@@ -6,10 +6,11 @@ Thanks for helping. Bug reports, ideas, docs fixes and pull requests are all wel
 Open an [issue](https://github.com/Robo-Binx/binxbar/issues/new/choose) using the bug template. Please include:
 - iCUE and Stream Deck app versions, and Windows version
 - what you expected and what happened
-- the last 20 lines of `mic-guard/mic-guard.log` if it involves mics, volume or voice bubbles
+- the last 20 lines of `mic-guard/mic-guard.log` if it involves mics, volume, voice bubbles or phone alerts; `edge-display/phone-action.log` or `edge-display/edge-follow.log` for calls, monitor follow or the number-pad keys
+- whether your Edge is standing up (portrait) or lying sideways
 - a photo or screenshot of the tile if it's visual
 
-**Remove anything personal** before posting: Discord server IDs, map keys, calendar links, usernames.
+**Remove anything personal** before posting: Discord server IDs, map keys, calendar links, usernames, contact names and phone numbers.
 
 ## Suggesting a feature
 Open an issue with the feature template. Say what you want to do at your desk, not just the button you have in mind; there may be a simpler way to fit it on the tile.

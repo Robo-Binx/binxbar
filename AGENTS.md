@@ -3,18 +3,19 @@
 Instructions for AI coding agents (Claude, Codex, Copilot and others) working on this repository. Human contributors: see [CONTRIBUTING.md](CONTRIBUTING.md). If you're helping someone **install** Binxbar rather than change it, use [docs/ai-setup.md](docs/ai-setup.md) instead.
 
 ## What this is
-An iCUE HTML widget for the Corsair Xeneon Edge touchscreen (`widget/`), plus Windows helpers it depends on (`mic-guard/`, `edge-display/`). See [docs/architecture.md](docs/architecture.md) before changing anything.
+An iCUE HTML widget for the Corsair Xeneon Edge touchscreen (`widget/`), plus Windows helpers it depends on (`mic-guard/`, `edge-display/` including `edge-follow` and the Phone Link `phone-action` script, and `tools/`). See [docs/architecture.md](docs/architecture.md) before changing anything.
 
 ## Hard constraints
 - **The widget is sandboxed.** It cannot spawn processes, read arbitrary files, or reach `localhost`. Network access is limited to the domains in `widget/manifest.json` `permissions`, granted only when the `.icuewidget` is imported.
-- **Two ways out of the tile:** pressing keys on the virtual Stream Deck (`window.Binxbar.tapKey(logicalIndex)` in `widget/scripts/mic.js`), and reading JSON files that `mic-guard` writes to `widget/resources/`.
+- **Two ways out of the tile:** pressing keys on the virtual Stream Deck (`window.Binxbar.tapKey(logicalIndex)` in `widget/scripts/mic.js`), and reading JSON files that `mic-guard` and `edge-follow` write to `widget/resources/`. For requests that carry data (a number to dial), the tile writes to its own local storage and presses key 21; `phone-action.ps1` reads iCUE's storage files (see [architecture](docs/architecture.md)).
 - **Stream Deck layout is a public contract.** The virtual deck is 8 × 4. Logical keys 0–11 map to the left three columns; 12+ fill the right five (`phys()` / `logical()` in `mic.js`). Never renumber existing keys; document any new key in [docs/stream-deck-keys.md](docs/stream-deck-keys.md).
+- **Portrait and landscape.** The Edge can stand up or lie sideways; portrait rules live in `@media (max-aspect-ratio: 1/1)` blocks in `hub.css`. Check both.
 - **No build step, no frameworks.** Plain ES2020 in `widget/scripts/*.js`; styles in `widget/styles/hub.css` are appended layers (later rules win).
 - **Settings** are `<meta name="x-icue-property">` tags in `widget/index.html`. Read them with `prop(name)`; handle missing values (settings added to an existing install can be undefined).
 - **Windows helpers** are PowerShell launched hidden through `.vbs` wrappers; they must run per-user without admin.
 
 ## Privacy rules
-Never commit personal data: Discord server IDs, usernames, map keys, calendar links, monitor IDs, device names from a specific machine, or screenshots that show any of these. Defaults in code and docs must be generic (e.g. `CHANGE_ME`, `UID12345`, "Yeti").
+Never commit personal data: Discord server IDs, usernames, map keys, calendar links, monitor IDs, device names from a specific machine, contacts, phone numbers, names of real people, or screenshots that show any of these. Doc screenshots use mocked data with made-up names. Logs must never contain message text or phone numbers. Defaults in code and docs must be generic (e.g. `CHANGE_ME`, `UID12345`, "Yeti").
 
 ## Making a change
 1. Keep changes small and focused. Match the existing style.

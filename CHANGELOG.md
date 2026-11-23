@@ -19,6 +19,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - **edge-follow helper:** the Edge turns off and on with your main monitor's own power button and brings its widgets back; **number-pad minus** flips the Edge between Binxbar and the Windows desktop; reports call status to the PHONE app. Starts with Windows.
 - **Calendar week view** with a WEEK / MONTH switch (remembers your choice).
 - `docs/privacy.md`: everything Binxbar keeps stays on your PC and is only used by Binxbar.
+- New README pictures for 1.2 (standing up, lying sideways, phone screens), made with example data.
 
 ### Changed
 - **Portrait support:** with the Edge standing up, the tile uses the full width, the top buttons stack icon over bigger words, and the clock stays on one line.
@@ -29,6 +30,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Fixed
 - The volume bar could slide your PC volume to 0 when the default output device changed (mic-guard now follows the current device; the tile stops a stuck volume).
 - Tap-to-join bubbles did nothing when *Tap-to-Join Channels* was left empty.
+- With the Edge standing up, the PHONE app now fills the whole tile (keypad stacked, contacts in one full-width list) and the music row no longer cuts song names short.
 
 ## [1.1.0] - 2026-11-22
 

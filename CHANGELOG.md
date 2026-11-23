@@ -5,6 +5,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Coming next
+- **TEXTS app:** read and answer texts on the Edge with the keyboard (code included, hidden until it's reliable).
+- **One inbox for everything:** messages waiting for a reply from texts, Facebook Messenger, Discord DMs and more, gathered from Windows notifications, with replies sent from Binxbar.
+
+## [1.2.0] - 2026-11-23
+
+### Added
+- **Phone calls (Microsoft Phone Link):** incoming calls take over the tile with the caller's name, a soft ringtone, **ANSWER** and **DECLINE**; missed calls show **CALL BACK**. See `docs/phone.md`.
+- **Text alerts:** texts from people you choose take over the tile (who it's from, never the message), with **REPLY**.
+- **PHONE app:** phone icon left of the clock. **RECENT** calls, **KEYPAD** (spells names too, keyboard works), **CONTACTS** (search box, A–Z jump, ★ favorites, 🔔 per-person text alerts), **MESSAGES** (opens Phone Link). An on-call screen shows **DIALING …**, **ON A CALL** with a timer, and **HANGING UP …**, and closes when the call really ends.
+- `tools/import-contacts.ps1`: turns a Google Contacts export into the PHONE app's contact list (kept on your PC only).
+- **edge-follow helper:** the Edge turns off and on with your main monitor's own power button and brings its widgets back; **number-pad minus** flips the Edge between Binxbar and the Windows desktop; reports call status to the PHONE app. Starts with Windows.
+- **Calendar week view** with a WEEK / MONTH switch (remembers your choice).
+- `docs/privacy.md`: everything Binxbar keeps stays on your PC and is only used by Binxbar.
+
+### Changed
+- **Portrait support:** with the Edge standing up, the tile uses the full width, the top buttons stack icon over bigger words, and the clock stays on one line.
+- Bigger words and icons on the top buttons; every button has the same outline.
+- **SPEAKER** button reads *PLAYING HEADSET / SWITCH* (or your speaker's name).
+- *DISCONNECT DISCORD* is now **ESCAPE DISCORD**.
+
+### Fixed
+- The volume bar could slide your PC volume to 0 when the default output device changed (mic-guard now follows the current device; the tile stops a stuck volume).
+- Tap-to-join bubbles did nothing when *Tap-to-Join Channels* was left empty.
+
 ## [1.1.0] - 2026-11-22
 
 ### Added

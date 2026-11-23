@@ -11,3 +11,17 @@ edge-display/player-state.txt
 widget/resources/calendar.ics
 widget/resources/speaker.json
 edge-display/speaker-switch.last
+# Personal data Binxbar keeps on your own PC only (never commit these)
+widget/resources/contacts.json
+widget/resources/phone-alerts.json
+widget/resources/phone.json
+widget/resources/phone-who.txt
+widget/resources/phone-token.txt
+widget/resources/call.json
+widget/resources/texts.jsonl
+edge-display/phone-action.log
+edge-display/phone-req.last
+edge-display/phone-req-dirs.txt
+edge-display/edge-follow.log
+edge-display/edge-follow.pid
+edge-display/log.txt
